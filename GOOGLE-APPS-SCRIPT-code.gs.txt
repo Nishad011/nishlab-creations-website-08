@@ -1,0 +1,190 @@
+/**
+ * NISHLAB CREATIONS — Website Backend (Apps Script)
+ * -----------------------------------------------------------
+ * Handles TWO things via one Web App:
+ *  1. Website form leads (Join Us, Free Demo)      → "Website Leads" tab
+ *  2. Real Student / Admin login & registration    → "Users" tab
+ *
+ * SETUP:
+ * 1. Open your Google Sheet → Extensions → Apps Script
+ * 2. Delete existing code, paste this entire file
+ * 3. In the function dropdown (top, next to Debug), select "createFirstAdmin"
+ *    and click ▶ Run ONCE. This creates your own Admin login.
+ *    (Change ADMIN_EMAIL / ADMIN_PASSWORD below FIRST, before running.)
+ * 4. Deploy → Manage deployments → edit (pencil) → New version → Deploy
+ *    (Who has access: Anyone) — reuse your existing /exec URL.
+ */
+
+const SHEET_LEADS = "Website Leads";
+const SHEET_USERS = "Users";
+
+// >>> CHANGE THESE BEFORE RUNNING createFirstAdmin() <<<
+const ADMIN_EMAIL = "nishad@nishlabcreations.com";
+const ADMIN_PASSWORD = "ChangeThisPassword123";
+// Shared key the admin dashboard sends when creating new student accounts.
+// Keep this the same string in this file and in admin-dashboard.html.
+const ADMIN_KEY = "nishlab-admin-2026";
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const action = data.action || "lead"; // default = old form-lead behaviour
+
+    if (action === "login") return handleLogin(data);
+    if (action === "register") return handleRegister(data);
+    if (action === "signup") return handleSignup(data);
+    return handleLead(data); // Join Us / Free Demo forms
+  } catch (err) {
+    return jsonOut({ result: "error", error: err.toString() });
+  }
+}
+
+function doGet(e) {
+  return jsonOut({ status: "Nishlab Creations backend is live" });
+}
+
+/* ---------------- FORM LEADS (Join Us / Free Demo) ---------------- */
+function handleLead(data) {
+  const sheet = getOrCreateSheet(SHEET_LEADS, [
+    "Timestamp", "Form Type", "Full Name", "Phone", "Email",
+    "Education", "Course Interest", "Demo Day", "Message"
+  ]);
+  sheet.appendRow([
+    new Date(), data.formType || "", data.name || "", data.phone || "",
+    data.email || "", data.education || "", data.courseInterest || "",
+    data.demoDay || "", data.message || ""
+  ]);
+  return jsonOut({ result: "success" });
+}
+
+/* ---------------- LOGIN ---------------- */
+function handleLogin(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  const password = String(data.password || "");
+  if (!email || !password) {
+    return jsonOut({ result: "error", message: "Email and password required." });
+  }
+
+  const sheet = getOrCreateSheet(SHEET_USERS, [
+    "Email", "PasswordHash", "Role", "FullName", "Status", "CreatedAt"
+  ]);
+  const rows = sheet.getDataRange().getValues();
+  const hash = hashPassword(password);
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const rowEmail = String(row[0] || "").trim().toLowerCase();
+    if (rowEmail === email) {
+      if (String(row[4]).toLowerCase() === "inactive") {
+        return jsonOut({ result: "error", message: "This account is inactive. Contact support." });
+      }
+      if (row[1] === hash) {
+        return jsonOut({
+          result: "success",
+          role: row[2],
+          name: row[3],
+          email: rowEmail,
+          adminKey: String(row[2]).toLowerCase() === "admin" ? ADMIN_KEY : ""
+        });
+      }
+      return jsonOut({ result: "error", message: "Incorrect password." });
+    }
+  }
+  return jsonOut({ result: "error", message: "No account found with this email." });
+}
+
+/* ---------------- PUBLIC SIGNUP (used by Free Videos "Create Account") ---------------- */
+/* No adminKey required — but role is ALWAYS forced to "Viewer" for security,
+   regardless of what the client sends. Only the Admin dashboard (handleRegister)
+   can create Student/Admin accounts. */
+function handleSignup(data) {
+  const email = String(data.email || "").trim().toLowerCase();
+  const password = String(data.password || "");
+  const name = String(data.name || "");
+
+  if (!email || !password || !name) {
+    return jsonOut({ result: "error", message: "Name, email and password required." });
+  }
+  if (password.length < 4) {
+    return jsonOut({ result: "error", message: "Password must be at least 4 characters." });
+  }
+
+  const sheet = getOrCreateSheet(SHEET_USERS, [
+    "Email", "PasswordHash", "Role", "FullName", "Status", "CreatedAt"
+  ]);
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).trim().toLowerCase() === email) {
+      return jsonOut({ result: "error", message: "An account with this email already exists. Please log in instead." });
+    }
+  }
+
+  sheet.appendRow([email, hashPassword(password), "Viewer", name, "Active", new Date()]);
+  return jsonOut({ result: "success", role: "Viewer", name: name, email: email });
+}
+
+/* ---------------- REGISTER (used by Admin dashboard "+ Add Student") ---------------- */
+function handleRegister(data) {
+  if (String(data.adminKey) !== ADMIN_KEY) {
+    return jsonOut({ result: "error", message: "Not authorized to create accounts." });
+  }
+  const email = String(data.email || "").trim().toLowerCase();
+  const password = String(data.password || "");
+  const name = String(data.name || "");
+  const role = String(data.role || "Student");
+
+  if (!email || !password || !name) {
+    return jsonOut({ result: "error", message: "Name, email and password required." });
+  }
+
+  const sheet = getOrCreateSheet(SHEET_USERS, [
+    "Email", "PasswordHash", "Role", "FullName", "Status", "CreatedAt"
+  ]);
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).trim().toLowerCase() === email) {
+      return jsonOut({ result: "error", message: "An account with this email already exists." });
+    }
+  }
+
+  sheet.appendRow([email, hashPassword(password), role, name, "Active", new Date()]);
+  return jsonOut({ result: "success" });
+}
+
+/* ---------------- ONE-TIME SETUP: run this yourself from the editor ---------------- */
+function createFirstAdmin() {
+  const sheet = getOrCreateSheet(SHEET_USERS, [
+    "Email", "PasswordHash", "Role", "FullName", "Status", "CreatedAt"
+  ]);
+  const email = ADMIN_EMAIL.trim().toLowerCase();
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).trim().toLowerCase() === email) {
+      Logger.log("Admin already exists: " + email);
+      return;
+    }
+  }
+  sheet.appendRow([email, hashPassword(ADMIN_PASSWORD), "Admin", "Nishad Ansar Ahmed Saifi", "Active", new Date()]);
+  Logger.log("Admin account created: " + email + " / " + ADMIN_PASSWORD);
+}
+
+/* ---------------- HELPERS ---------------- */
+function hashPassword(password) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password, Utilities.Charset.UTF_8);
+  return bytes.map(b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
+}
+
+function getOrCreateSheet(name, headerRow) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(name);
+  if (!sheet) {
+    sheet = ss.insertSheet(name);
+    sheet.appendRow(headerRow);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}

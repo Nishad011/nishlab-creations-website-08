@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nishlab Creations | Login</title>
+<style>:root{--n:#061735;--n2:#0d2c5c;--g:#f4b400;--bg:#f5f7fb;--m:#64748b;--l:#dce4ef;--red:#c53d3d}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(125deg,#030c1d,#0b2857);font-family:Inter,Segoe UI,Arial;color:#172033;display:grid;place-items:center;padding:20px}.box{width:min(430px,100%);background:#fff;border-radius:20px;padding:32px;box-shadow:0 25px 70px #0006}.brand{text-align:center}.brand img{width:60px;height:60px;object-fit:contain;background:#000;border-radius:8px}.brand b{display:block;color:var(--n);letter-spacing:2px;margin-top:8px}.brand small{color:#a87400;letter-spacing:2px}.k{color:#a87400;font-size:10px;font-weight:900;letter-spacing:2px;text-align:center;margin-top:25px}.box h1{text-align:center;color:var(--n);font-size:26px;margin:8px 0}.sub{text-align:center;color:var(--m);font-size:11px;line-height:1.6}.field{margin-top:14px}.field label{display:block;color:var(--n);font-size:10px;font-weight:900;margin-bottom:6px}.field input{width:100%;padding:12px;border:1px solid var(--l);border-radius:8px;outline:0}.btn{width:100%;margin-top:17px;border:0;border-radius:9px;padding:13px;background:var(--g);color:var(--n);font-weight:900;cursor:pointer}.btn:disabled{opacity:.6;cursor:default}.links{display:flex;justify-content:space-between;margin-top:15px;font-size:10px}.links a{color:#1d5ba8;text-decoration:none}.msg{display:none;background:#eaf8f0;color:#15965a;padding:10px;border-radius:8px;font-size:10px;font-weight:800;margin-top:12px;text-align:center}.errmsg{display:none;background:#fdeeee;color:var(--red);padding:10px;border-radius:8px;font-size:10px;font-weight:800;margin-top:12px;text-align:center}.back{text-align:center;margin-top:20px;font-size:10px}.back a{color:#1d5ba8}</style></head>
+<body>
+<div class="box">
+<div class="brand"><img src="nishlab-logo.png" alt="Nishlab Creations"><b>NISHLAB</b><small>CREATIONS</small></div>
+<div class="k">STUDENT / ADMIN PORTAL</div>
+<h1>Welcome Back</h1>
+<div class="sub">Sign in to access your courses, progress, projects, certificates and learning resources.</div>
+<form id="loginForm" onsubmit="doLogin(event)">
+<div class="field"><label>EMAIL</label><input id="l_email" required type="email" placeholder="Enter your email"></div>
+<div class="field"><label>PASSWORD</label><input id="l_password" required type="password" placeholder="Enter password"></div>
+<button class="btn" type="submit" id="loginBtn">SIGN IN →</button>
+</form>
+<div class="msg" id="msg">Login successful. Opening your dashboard...</div>
+<div class="errmsg" id="errmsg">Invalid email or password.</div>
+<div class="links"><a href="#" onclick="forgot(event)">Forgot password?</a><a href="join.html">New student? Join us</a></div>
+<div class="back"><a href="index.html">← Back to Nishlab Creations</a></div>
+</div>
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoy2NIWVPHsmsPIlF6bt8iKp3-uaZSfo-zP8uPRSm4XCSqRkBPthyYNHiy55HIExlX4A/exec";
+
+function doLogin(e){
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const msg = document.getElementById('msg');
+  const err = document.getElementById('errmsg');
+  msg.style.display='none'; err.style.display='none';
+
+  const email = document.getElementById('l_email').value.trim();
+  const password = document.getElementById('l_password').value;
+
+  btn.disabled = true; btn.textContent = 'SIGNING IN...';
+
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'login', email: email, password: password })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if(res.result === 'success'){
+      sessionStorage.setItem('nishlab_session', JSON.stringify({
+        email: res.email, name: res.name, role: res.role, adminKey: res.adminKey || ''
+      }));
+      msg.style.display='block';
+      setTimeout(()=>{
+        location.href = (String(res.role).toLowerCase() === 'admin') ? 'admin-dashboard.html' : 'student-dashboard.html';
+      }, 500);
+    } else {
+      err.textContent = res.message || 'Login failed. Please try again.';
+      err.style.display='block';
+      btn.disabled=false; btn.textContent='SIGN IN →';
+    }
+  })
+  .catch(() => {
+    err.textContent = 'Could not reach the server. Check your internet connection.';
+    err.style.display='block';
+    btn.disabled=false; btn.textContent='SIGN IN →';
+  });
+}
+function forgot(e){e.preventDefault();alert('Please contact Nishlab Creations support at nishad@nishlabcreations.com to reset your password.')}
+</script>
+</body></html>

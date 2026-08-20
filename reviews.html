@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nishlab Creations | Student Reviews</title>
+<style>
+:root{--n:#061735;--n2:#0d2c5c;--g:#f4b400;--bg:#f5f7fb;--w:#fff;--t:#172033;--m:#64748b;--l:#dce4ef;--green:#15965a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--t)}
+a{text-decoration:none}.header{position:sticky;top:0;z-index:50;background:rgba(6,23,53,.98)}.nav{max-width:1300px;margin:auto;min-height:76px;padding:9px 22px;display:flex;align-items:center;gap:22px}.brand{display:flex;align-items:center;gap:10px;color:#fff;min-width:220px}.brand img{width:50px;height:50px;object-fit:contain;background:#000;border-radius:7px}.brand b{display:block;letter-spacing:2px}.brand small{color:var(--g);letter-spacing:2.5px}.menu{display:flex;justify-content:center;gap:3px;flex:1}.menu a{color:#dce6f5;font-size:12px;padding:10px;border-radius:8px}.menu a:hover,.menu a.active{background:var(--n2);color:#fff}.login{background:var(--g);color:var(--n);font-weight:900;padding:12px 15px;border-radius:8px;font-size:12px}
+
+.hero{background:linear-gradient(125deg,#030c1d,#0b2857 65%,#123d7d);color:#fff}
+.hero-in{max-width:1000px;margin:auto;padding:65px 22px;text-align:center}
+.kicker{color:#ffd75c;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+.hero h1{font-size:48px;line-height:1.06;letter-spacing:-1.5px;margin:14px 0}.hero h1 span{color:var(--g)}
+.hero p{max-width:650px;margin:0 auto 26px;color:#d5e0ef;font-size:14px;line-height:1.85}
+.rating-strip{display:flex;justify-content:center;align-items:center;gap:22px;flex-wrap:wrap}
+.rbig{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border:1px solid rgba(244,180,0,.35);border-radius:16px;padding:16px 22px}
+.rbig .num{font-size:38px;font-weight:900;color:var(--g)}
+.rbig .stars{color:var(--g);font-size:16px;letter-spacing:2px}
+.rbig .sub{font-size:10px;color:#c9d5e8;margin-top:2px}
+.gchip{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--n);font-size:11px;font-weight:900;padding:10px 14px;border-radius:10px}
+
+.wrap{max-width:1300px;margin:auto;padding:55px 22px}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.review-card{background:#fff;border:1px solid var(--l);border-radius:16px;padding:22px;display:flex;flex-direction:column}
+.review-top{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--n);color:var(--g);display:grid;place-items:center;font-weight:900;font-size:12px;flex:none}
+.reviewer{font-size:12px;font-weight:900;color:var(--n)}
+.review-meta{font-size:9px;color:var(--m)}
+.stars-row{color:var(--g);font-size:13px;letter-spacing:2px;margin-bottom:8px}
+.review-text{font-size:12px;color:#4d5a6c;line-height:1.75;flex:1}
+.reply{margin-top:14px;background:#f8fafc;border-left:3px solid var(--g);border-radius:0 8px 8px 0;padding:10px 12px}
+.reply b{font-size:10px;color:var(--n);display:block;margin-bottom:4px}
+.reply p{margin:0;font-size:11px;color:var(--m);line-height:1.6}
+
+.cta{margin-top:50px;background:var(--n);color:#fff;border-radius:20px;text-align:center;padding:42px 22px}
+.cta h2{font-size:30px;margin:0 0 8px}.cta p{color:#d5e0ef;font-size:13px;margin:0 0 20px}
+.buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:13px 18px;border-radius:9px;font-size:12px;font-weight:900}
+.gold{background:var(--g);color:var(--n)}.outline{border:1px solid rgba(255,255,255,.3);color:#fff}
+
+footer{background:#040d20;color:#cbd6e5;padding:32px 22px}.foot{max-width:1300px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px}.foot b{color:#fff;letter-spacing:2px}.foot b span{color:var(--g)}.foot a{color:#8fa8cc}
+@media(max-width:900px){.menu{display:none}.login{margin-left:auto}.reviews-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.brand div{display:none}.hero-in,.wrap{padding-left:16px;padding-right:16px}.hero h1{font-size:32px}.reviews-grid{grid-template-columns:1fr}.rating-strip{flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="header"><div class="nav">
+<a class="brand" href="index.html"><img src="nishlab-logo.png" alt="Nishlab Creations"><div><b>NISHLAB</b><small>CREATIONS</small></div></a>
+<nav class="menu"><a href="index.html">Home</a><a href="courses.html">Courses</a><a href="about.html">About Us</a><a href="workshops.html">Workshops</a><a href="join.html">Join Us</a><a href="videos.html">Free Videos</a><a href="plans.html">Plans</a><a class="active" href="reviews.html">Reviews</a><a href="demo.html">Free Demo</a></nav>
+<a class="login" href="login.html">Student Login</a>
+</div></header>
+
+<section class="hero"><div class="hero-in">
+<div class="kicker">What Our Students Say</div>
+<h1>Real Reviews From <span>Real Students.</span></h1>
+<p>Genuine feedback from students who have trained with Nishlab Creations — collected directly from our Google Business Profile.</p>
+<div class="rating-strip">
+<div class="rbig"><div><div class="num">5.0</div><div class="sub">out of 5</div></div><div><div class="stars">★★★★★</div><div class="sub">22 Google Reviews</div></div></div>
+<a class="gchip" href="https://www.google.com/maps/place/NISHLABCREATIONS" target="_blank" rel="noopener">🔗 View on Google Maps</a>
+</div>
+</div></section>
+
+<main class="wrap">
+<div class="reviews-grid">
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">RK</div><div><div class="reviewer">Ritik Kumar</div><div class="review-meta">1 review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Excellent 👏👏👏 Thank you for your efforts in the SolidWorks course. Explanation with multiple examples.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">MA</div><div><div class="reviewer">Mohamed Awais</div><div class="review-meta">1 review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">I had some doubts about taking online classes because I wasn't sure how effective online learning would be, but this course has completely exceeded my expectations.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">SK</div><div><div class="reviewer">Saurabh Karande</div><div class="review-meta">Local Guide · 14 reviews</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Great teaching skill, friendly and clear each and every doubt with some great examples.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">AS</div><div><div class="reviewer">Ayan Shaikh</div><div class="review-meta">1 review · 4 photos</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">I had a lot of fun learning with you, and you were very helpful to me too — may you continue to grow like this.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">MM</div><div><div class="reviewer">Mohd Mehboob</div><div class="review-meta">3 reviews · 2 photos</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">I did the AutoCAD 2D and SolidWorks course from Nishad sir. He cleared the concepts right from the basics and solved every doubt immediately. The practical training and support were really good.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">AH</div><div><div class="reviewer">Abu Hurera Shaikh</div><div class="review-meta">2 reviews</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Best AutoCAD Centre.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">SS</div><div><div class="reviewer">Shubham Sawant</div><div class="review-meta">Google review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Very easy to learn from Nishad sir.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">CT</div><div><div class="reviewer">CEO, THPS</div><div class="review-meta">3 reviews</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Nishad sir is an excellent teacher. Genuine & authentic CAD/CAE .. Good class.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">IT</div><div><div class="reviewer">Imad Tambe</div><div class="review-meta">Google review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Had a really good experience learning SolidWorks from Nishad sir. He is the best ❤️</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">DT</div><div><div class="reviewer">Dawood Tambe</div><div class="review-meta">Google review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Excellent teaching.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">VD</div><div><div class="reviewer">Vedant Dandekar</div><div class="review-meta">4 reviews · 1 photo</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Excellent coaching, and concepts cleared thoroughly.</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">ZM</div><div><div class="reviewer">Zaahid Mahaldar</div><div class="review-meta">Google review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Nice place to grab new skills, and sir is also friendly 😉</p>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">WK</div><div><div class="reviewer">Warrior Khan</div><div class="review-meta">1 review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Great tutoring ❤️</p>
+<div class="reply"><b>Reply from NISHLAB CREATIONS</b><p>Thank you so much, Warrior! Really glad you enjoyed the sessions. Wishing you all the best ahead — feel free to reach out anytime if you need help with anything CAD/CAE related. 🚀 — Nishad</p></div>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">IM</div><div><div class="reviewer">Mohd Izhaan Mukadam</div><div class="review-meta">1 review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Excellent.</p>
+<div class="reply"><b>Reply from NISHLAB CREATIONS</b><p>Thank you so much, Izhaan! Glad you had a great experience. Wishing you all the best for your career ahead — feel free to reach out anytime if you need guidance. 🚀 — Nishad</p></div>
+</div>
+
+<div class="review-card">
+<div class="review-top"><div class="avatar">YU</div><div><div class="reviewer">Yusuf U</div><div class="review-meta">Google review</div></div></div>
+<div class="stars-row">★★★★★</div>
+<p class="review-text">Good teaching on ANSYS, practical knowledge is good.</p>
+<div class="reply"><b>Reply from NISHLAB CREATIONS</b><p>Thank you so much Yusuf for your kind words! Glad you found the ANSYS practical training valuable. We focus on hands-on, industry-relevant learning so students can build real confidence in the software. — Nishad</p></div>
+</div>
+
+</div>
+
+<section class="cta">
+<h2>Ready to Become Our Next Success Story?</h2>
+<p>Join a free live demo and experience the training before you enroll.</p>
+<div class="buttons"><a class="btn gold" href="demo.html">Join Free Demo</a><a class="btn outline" href="join.html">Enquire Now</a></div>
+</section>
+</main>
+
+<footer><div class="foot"><div><b>NISHLAB <span>CREATIONS</span></b><br>LEARN. CREATE. GET HIRED.<br><span style="font-size:9px;color:#8a97a9">MSME Registered (Udyam) · Antop Hill, Mumbai</span></div><div>Online Engineering Software Training Institute<br><a href="privacy-policy.html">Privacy Policy</a> · <a href="terms-conditions.html">Terms</a> · <a href="refund-policy.html">Refunds</a></div><div>+91 84240 99617 · nishad@nishlabcreations.com</div></div></footer>
+</body>
+</html>
