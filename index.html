@@ -146,7 +146,7 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
     <span class="doom-strip-batch" id="doom-batch-label">— Batch: 1 September</span>
   </div>
 </div>
-<audio id="doomAudio" src="doomsday-tick.mp3" loop preload="auto" playsinline></audio>
+<audio id="doomAudio" src="batch-alert-sound.mp3" loop preload="auto" playsinline></audio>
 
 <header class="header">
   <div class="nav">
@@ -270,6 +270,24 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
     {label:"11 September", date:"2026-09-11T20:00:00+05:30"}
   ];
 
+  // ---- Always-on background sound (Pixabay royalty-free cinematic clip, looped) ----
+  var audioEl = document.getElementById('doomAudio');
+  function tryPlayAudio(){
+    if(!audioEl) return;
+    var p = audioEl.play();
+    if(p && typeof p.catch === 'function'){
+      p.catch(function(){
+        // Autoplay-with-sound was blocked by the browser — start on the visitor's first interaction instead.
+        var start = function(){ audioEl.play().catch(function(){}); };
+        ['click','touchstart','keydown','scroll'].forEach(function(evt){
+          document.addEventListener(evt, start, {once:true, passive:true});
+        });
+      });
+    }
+  }
+  tryPlayAudio();
+  // ---- end sound setup ----
+
   function nextBatch(){
     var now = new Date().getTime();
     for(var i=0;i<batches.length;i++){
@@ -318,25 +336,6 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
   }
   tick();
   setInterval(tick,1000);
-
-  // ---- Always-on background sound (from uploaded mp3) ----
-  var audioEl = document.getElementById('doomAudio');
-  function tryPlayAudio(){
-    if(!audioEl) return;
-    var p = audioEl.play();
-    if(p && typeof p.catch === 'function'){
-      p.catch(function(){
-        // Autoplay-with-sound was blocked by the browser — start on the visitor's first interaction instead.
-        var start = function(){
-          audioEl.play().catch(function(){});
-        };
-        ['click','touchstart','keydown','scroll'].forEach(function(evt){
-          document.addEventListener(evt, start, {once:true, passive:true});
-        });
-      });
-    }
-  }
-  tryPlayAudio();
 })();
 </script>
 
