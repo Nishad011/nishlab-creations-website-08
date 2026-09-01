@@ -107,6 +107,15 @@ h1 span{color:var(--gold)}
 .timer span{font-size:9px;letter-spacing:1.5px;color:#c9d5e8;text-transform:uppercase}
 .timer.urgent b{color:#ff4d4d;animation:cd-pulse 1s infinite}
 @keyframes cd-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+.doom-strip{background:linear-gradient(90deg,#050f1f,#0d2b5d 50%,#050f1f);color:#fff;padding:10px 16px;text-align:center}
+.doom-strip-inner{max-width:1250px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:10px 14px}
+.doom-strip-label{font-size:11px;letter-spacing:2px;color:#f4b400;font-weight:800;text-transform:uppercase}
+.doom-strip-time{font-size:20px;font-weight:800;letter-spacing:2px;font-variant-numeric:tabular-nums;color:#fff}
+.doom-strip-time.urgent{color:#ff4d4d;animation:cd-pulse 1s infinite}
+.doom-strip-sub{font-size:9px;letter-spacing:1.5px;color:#9fb0cc;text-transform:uppercase}
+.doom-strip-batch{font-size:11px;color:#dbe5f5}
+@media(max-width:600px){.doom-strip-time{font-size:16px}.doom-strip-label{font-size:10px}}
 @media(max-width:900px){.countdown-box{grid-template-columns:1fr}}
 @media(max-width:600px){.timer{grid-template-columns:repeat(2,1fr);gap:8px}.countdown-box{padding:28px 20px}}
 
@@ -128,6 +137,16 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
 </style>
 </head>
 <body>
+
+<div class="doom-strip" id="doomStrip">
+  <div class="doom-strip-inner">
+    <span class="doom-strip-label">⏳ New Batch Starts In</span>
+    <span class="doom-strip-time" id="doom-time">00 : 00 : 00 : 00</span>
+    <span class="doom-strip-sub">Days &nbsp;·&nbsp; Hours &nbsp;·&nbsp; Min &nbsp;·&nbsp; Sec</span>
+    <span class="doom-strip-batch" id="doom-batch-label">— Batch: 1 September</span>
+  </div>
+</div>
+<audio id="doomAudio" src="assets/doomsday-tick.mp3" loop preload="auto" playsinline></audio>
 
 <header class="header">
   <div class="nav">
@@ -232,7 +251,6 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
        <div><b id="cd-mins">00</b><span>Minutes</span></div>
        <div><b id="cd-secs">00</b><span>Seconds</span></div>
      </div>
-     <button type="button" id="sound-toggle" aria-pressed="false" style="margin-top:14px;background:rgba(255,255,255,.08);border:1px solid rgba(244,180,0,.4);color:#f4b400;font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">🔇 Tick Sound: Off</button>
    </div>
  </div>
 </div>
@@ -252,53 +270,6 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
     {label:"11 September", date:"2026-09-11T20:00:00+05:30"}
   ];
 
-  // ---- Doomsday-clock style tick sound (synthesized, no audio file needed) ----
-  var audioCtx = null;
-  var soundOn = false;
-  try { soundOn = localStorage.getItem('nishlab_tick_sound') === '1'; } catch(e){}
-  var soundBtn = document.getElementById('sound-toggle');
-
-  function ensureAudio(){
-    if(!audioCtx){
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if(AC) audioCtx = new AC();
-    }
-    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  }
-
-  function playTick(urgent){
-    if(!audioCtx) return;
-    var t = audioCtx.currentTime;
-    var osc = audioCtx.createOscillator();
-    var gain = audioCtx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(urgent ? 1400 : 1000, t);
-    gain.gain.setValueAtTime(urgent ? 0.22 : 0.14, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(t);
-    osc.stop(t + 0.07);
-  }
-
-  function updateSoundBtn(){
-    if(!soundBtn) return;
-    soundBtn.textContent = soundOn ? '🔊 Tick Sound: On' : '🔇 Tick Sound: Off';
-    soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
-  }
-  updateSoundBtn();
-
-  if(soundBtn){
-    soundBtn.addEventListener('click', function(){
-      ensureAudio();
-      soundOn = !soundOn;
-      try { localStorage.setItem('nishlab_tick_sound', soundOn ? '1' : '0'); } catch(e){}
-      updateSoundBtn();
-      if(soundOn) playTick(false);
-    });
-  }
-  // ---- end sound setup ----
-
   function nextBatch(){
     var now = new Date().getTime();
     for(var i=0;i<batches.length;i++){
@@ -306,35 +277,66 @@ footer{background:#050f23;color:#c9d5e8;padding:35px 24px}
     }
     return batches[batches.length-1];
   }
+
   function tick(){
     var b = nextBatch();
     var target = new Date(b.date).getTime();
     var now = new Date().getTime();
     var diff = target - now;
+
     var els = {d:document.getElementById('cd-days'),h:document.getElementById('cd-hours'),m:document.getElementById('cd-mins'),s:document.getElementById('cd-secs')};
     var lbl = document.getElementById('cd-label');
     var timerBox = document.getElementById('batchTimer');
-    if(!els.d) return;
+    var stripTime = document.getElementById('doom-time');
+    var stripBatch = document.getElementById('doom-batch-label');
+
     if(lbl) lbl.textContent = "Next Batch: " + b.label;
+    if(stripBatch) stripBatch.textContent = "— Batch: " + b.label;
+
     if(diff <= 0){
-      els.d.textContent='00'; els.h.textContent='00'; els.m.textContent='00'; els.s.textContent='00';
+      if(els.d){ els.d.textContent='00'; els.h.textContent='00'; els.m.textContent='00'; els.s.textContent='00'; }
+      if(stripTime) stripTime.textContent = "00 : 00 : 00 : 00";
       return;
     }
+
     var d = Math.floor(diff/(1000*60*60*24));
     var h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
     var m = Math.floor((diff%(1000*60*60))/(1000*60));
     var s = Math.floor((diff%(1000*60))/1000);
-    els.d.textContent = String(d).padStart(2,'0');
-    els.h.textContent = String(h).padStart(2,'0');
-    els.m.textContent = String(m).padStart(2,'0');
-    els.s.textContent = String(s).padStart(2,'0');
+    var dd = String(d).padStart(2,'0'), hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0'), ss = String(s).padStart(2,'0');
 
+    if(els.d){
+      els.d.textContent = dd; els.h.textContent = hh; els.m.textContent = mm; els.s.textContent = ss;
+    }
     var urgent = diff <= 60000; // last 60 seconds — doomsday-style urgency
     if(timerBox) timerBox.classList.toggle('urgent', urgent);
-    if(soundOn) playTick(urgent);
+
+    if(stripTime){
+      stripTime.textContent = dd + " : " + hh + " : " + mm + " : " + ss;
+      stripTime.classList.toggle('urgent', urgent);
+    }
   }
   tick();
   setInterval(tick,1000);
+
+  // ---- Always-on background sound (from uploaded mp3) ----
+  var audioEl = document.getElementById('doomAudio');
+  function tryPlayAudio(){
+    if(!audioEl) return;
+    var p = audioEl.play();
+    if(p && typeof p.catch === 'function'){
+      p.catch(function(){
+        // Autoplay-with-sound was blocked by the browser — start on the visitor's first interaction instead.
+        var start = function(){
+          audioEl.play().catch(function(){});
+        };
+        ['click','touchstart','keydown','scroll'].forEach(function(evt){
+          document.addEventListener(evt, start, {once:true, passive:true});
+        });
+      });
+    }
+  }
+  tryPlayAudio();
 })();
 </script>
 
